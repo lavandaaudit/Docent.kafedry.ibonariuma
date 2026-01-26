@@ -1,0 +1,887 @@
+<!DOCTYPE html>
+<html lang="uk">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <meta name="referrer" content="no-referrer">
+    <meta name="robots" content="noindex,nofollow">
+    <title>ibonarium.laborant.ai1 :: full knowledge base</title>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html,
+        body {
+            width: 100%;
+            height: 100%;
+            background: #000;
+            color: #4dd2ff;
+            font-family: "Courier New", monospace;
+            overflow-x: hidden;
+        }
+
+        canvas {
+            position: fixed;
+            inset: 0;
+            z-index: 0;
+        }
+
+        .formula-layer {
+            position: fixed;
+            inset: 0;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        .formula {
+            position: absolute;
+            color: rgba(77, 210, 255, 0.4);
+            font-size: 12px;
+            white-space: nowrap;
+            opacity: 0;
+            animation: floatFormula linear forwards;
+            text-shadow: 0 0 8px rgba(77, 210, 255, 0.3);
+        }
+
+        @keyframes floatFormula {
+            0% {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+
+            10% {
+                opacity: 1;
+            }
+
+            90% {
+                opacity: 1;
+            }
+
+            100% {
+                opacity: 0;
+                transform: translateY(-120px);
+            }
+        }
+
+        .container {
+            position: relative;
+            z-index: 2;
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 40px 20px;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid rgba(77, 210, 255, 0.2);
+        }
+
+        .logo {
+            font-size: 28px;
+            letter-spacing: 3px;
+            margin-bottom: 8px;
+            text-shadow: 0 0 15px rgba(77, 210, 255, 0.6);
+        }
+
+        .subtitle {
+            font-size: 11px;
+            opacity: 0.6;
+            letter-spacing: 2px;
+        }
+
+        .status {
+            margin-top: 15px;
+            font-size: 10px;
+            opacity: 0.5;
+        }
+
+        .status-dot {
+            display: inline-block;
+            width: 6px;
+            height: 6px;
+            background: #4dd2ff;
+            border-radius: 50%;
+            margin-right: 5px;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+
+            0%,
+            100% {
+                opacity: 1;
+            }
+
+            50% {
+                opacity: 0.3;
+            }
+        }
+
+        .data-section {
+            background: rgba(0, 20, 40, 0.3);
+            border: 1px solid rgba(77, 210, 255, 0.2);
+            border-radius: 5px;
+            padding: 20px;
+            margin-bottom: 25px;
+        }
+
+        .section-title {
+            font-size: 13px;
+            margin-bottom: 15px;
+            opacity: 0.8;
+            letter-spacing: 1px;
+        }
+
+        .data-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px solid rgba(77, 210, 255, 0.1);
+            font-size: 12px;
+        }
+
+        .data-row:last-child {
+            border-bottom: none;
+        }
+
+        .data-label {
+            opacity: 0.6;
+        }
+
+        .data-value {
+            font-weight: bold;
+        }
+
+        .status-indicator {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 3px;
+            font-size: 9px;
+            margin-left: 8px;
+        }
+
+        .status-ok {
+            background: rgba(0, 255, 100, 0.2);
+            color: #0f0;
+        }
+
+        .status-warn {
+            background: rgba(255, 200, 0, 0.2);
+            color: #fc0;
+        }
+
+        .status-alert {
+            background: rgba(255, 50, 50, 0.2);
+            color: #f33;
+        }
+
+        .chat-box {
+            background: rgba(0, 20, 40, 0.3);
+            border: 1px solid rgba(77, 210, 255, 0.2);
+            border-radius: 5px;
+            padding: 20px;
+            margin-bottom: 25px;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .chat-messages {
+            flex: 1;
+            overflow-y: auto;
+            margin-bottom: 15px;
+            max-height: 500px;
+            min-height: 300px;
+        }
+
+        .message {
+            margin-bottom: 15px;
+            font-size: 11px;
+            line-height: 1.7;
+            animation: fadeIn 0.3s;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(5px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .msg-time {
+            font-size: 9px;
+            opacity: 0.4;
+            margin-bottom: 3px;
+        }
+
+        .msg-bot {
+            color: #4dd2ff;
+        }
+
+        .msg-user {
+            color: #9fe7ff;
+            text-align: right;
+        }
+
+        .chat-input-box {
+            display: flex;
+            gap: 8px;
+        }
+
+        .chat-input {
+            flex: 1;
+            background: rgba(0, 10, 20, 0.5);
+            border: 1px solid rgba(77, 210, 255, 0.3);
+            color: #4dd2ff;
+            padding: 10px;
+            border-radius: 3px;
+            font-family: "Courier New", monospace;
+            font-size: 12px;
+        }
+
+        .chat-input:focus {
+            outline: none;
+            border-color: #4dd2ff;
+        }
+
+        .send-btn {
+            background: transparent;
+            border: 1px solid #4dd2ff;
+            color: #4dd2ff;
+            padding: 10px 20px;
+            border-radius: 3px;
+            cursor: pointer;
+            font-family: "Courier New", monospace;
+            font-size: 12px;
+            transition: 0.3s;
+        }
+
+        .send-btn:hover {
+            background: rgba(77, 210, 255, 0.1);
+            box-shadow: 0 0 10px rgba(77, 210, 255, 0.4);
+        }
+
+        .actions {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: 10px;
+            margin-bottom: 25px;
+        }
+
+        .action-btn {
+            background: rgba(0, 20, 40, 0.3);
+            border: 1px solid rgba(77, 210, 255, 0.2);
+            color: #4dd2ff;
+            padding: 12px;
+            border-radius: 3px;
+            cursor: pointer;
+            font-family: "Courier New", monospace;
+            font-size: 11px;
+            transition: 0.3s;
+            text-align: center;
+        }
+
+        .action-btn:hover {
+            background: rgba(77, 210, 255, 0.1);
+            border-color: #4dd2ff;
+            box-shadow: 0 0 10px rgba(77, 210, 255, 0.3);
+        }
+
+        .footer {
+            text-align: center;
+            font-size: 9px;
+            opacity: 0.3;
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px solid rgba(77, 210, 255, 0.1);
+        }
+
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: rgba(0, 20, 40, 0.5);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: rgba(77, 210, 255, 0.3);
+            border-radius: 3px;
+        }
+
+        @media (max-width: 600px) {
+            .logo {
+                font-size: 22px;
+            }
+
+            .actions {
+                grid-template-columns: 1fr;
+            }
+
+            .message {
+                font-size: 10px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <canvas id="stars"></canvas>
+    <div class="formula-layer" id="formulaLayer"></div>
+
+    <div class="container">
+
+        <div class="header">
+            <div class="logo">ibonarium.laborant.ai1</div>
+            <div class="subtitle">full knowledge base :: expert system</div>
+            <div class="status">
+                <span class="status-dot"></span>
+                <span id="statusText">online :: ready</span>
+            </div>
+        </div>
+
+        <div class="data-section">
+            <div class="section-title">⚡ space weather</div>
+            <div id="dataDisplay">
+                <div class="data-row">
+                    <span class="data-label">loading...</span>
+                    <span class="data-value">—</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="chat-box">
+            <div class="section-title">💬 expert assistant</div>
+            <div class="chat-messages" id="chatMessages">
+                <div class="message msg-bot">
+                    <div class="msg-time">system</div>
+                    <div>вітаю. я laborant.ai1 - експертна система ibonarium.<br><br>
+                        маю детальні знання про:<br>
+                        • 8 core радарів з повними описами механізмів<br>
+                        • 9 лабораторій з технічними деталями<br>
+                        • алгоритми, джерела даних, застосування<br><br>
+                        запитайте про будь-який радар або проект для детального опису! 📚</div>
+                </div>
+            </div>
+            <div class="chat-input-box">
+                <input type="text" class="chat-input" id="chatInput" placeholder="запитайте про радар або проект...">
+                <button class="send-btn" onclick="sendMsg()">send</button>
+            </div>
+        </div>
+
+        <div class="actions">
+            <button class="action-btn" onclick="quickAction('radars')">🎯 радари</button>
+            <button class="action-btn" onclick="quickAction('labs')">🔬 лабораторії</button>
+            <button class="action-btn" onclick="quickAction('report')">📊 звіт</button>
+            <button class="action-btn" onclick="quickAction('help')">❓ допомога</button>
+        </div>
+
+        <div class="footer">
+            ibonarium project 2026 :: full knowledge base v3.0
+        </div>
+
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/markdown-it/13.0.1/markdown-it.min.js"></script>
+    <script>
+        // ===== STARS =====
+        const s = document.getElementById("stars");
+        const ctx = s.getContext("2d");
+        let W, H, stars = [];
+
+        function resize() {
+            W = s.width = innerWidth;
+            H = s.height = innerHeight;
+            stars = Array.from({ length: 200 }, () => ({
+                x: Math.random() * W,
+                y: Math.random() * H,
+                z: Math.random() * W
+            }));
+        }
+        resize();
+        addEventListener("resize", resize);
+
+        function draw() {
+            ctx.fillStyle = "#000";
+            ctx.fillRect(0, 0, W, H);
+            ctx.fillStyle = "#4dd2ff";
+
+            stars.forEach(st => {
+                st.z -= 0.3;
+                if (st.z <= 0) st.z = W;
+                const k = 128 / st.z;
+                const x = (st.x - W / 2) * k + W / 2;
+                const y = (st.y - H / 2) * k + H / 2;
+                if (x > 0 && x < W && y > 0 && y < H) {
+                    const size = (1 - st.z / W) * 2;
+                    ctx.fillRect(x, y, size, size);
+                }
+            });
+            requestAnimationFrame(draw);
+        }
+        draw();
+
+        // ===== FORMULAS =====
+        const formulas = [
+            "E = mc²", "F = ma", "∇·E = ρ/ε₀", "∇×B = μ₀J",
+            "Δx·Δp ≥ ħ/2", "iħ∂ψ/∂t = Ĥψ", "S = k·lnΩ",
+            "e^{iπ} + 1 = 0", "∂L/∂q − d/dt(∂L/∂q̇) = 0",
+            "R_{μν} − ½Rg_{μν} = 8πT_{μν}"
+        ];
+        const layer = document.getElementById("formulaLayer");
+
+        function spawnFormula() {
+            const f = document.createElement("div");
+            f.className = "formula";
+            f.textContent = formulas[Math.floor(Math.random() * formulas.length)];
+            f.style.left = Math.random() * 80 + 10 + "%";
+            f.style.top = Math.random() * 80 + 10 + "%";
+            f.style.animationDuration = (15 + Math.random() * 10) + "s";
+            layer.appendChild(f);
+            setTimeout(() => f.remove(), 25000);
+        }
+        setInterval(spawnFormula, 3000);
+
+        // ===== KNOWLEDGE BASE =====
+        const KNOWLEDGE = `
+# CORE РАДАРИ (8 СИСТЕМ)
+
+## 1. TEST2.ORIGINAL.FILE
+**Тип:** Тестовий радар
+**Призначення:** Експериментальна платформа
+
+**Механізм:**
+• Sandbox середовище для тестування API інтеграцій
+• Валідація нових джерел даних перед production
+• A/B тестування алгоритмів аналізу
+• Стрес-тестування під навантаженням
+
+**Технології:**
+• Модульна архітектура
+• Автоматичні тести коректності
+• Ізольоване середовище
+• Детальне логування операцій
+
+---
+
+## 2. SONCEMETR 2026
+**Тип:** Сонячний радар
+**Призначення:** Моніторинг сонячної активності
+
+**Механізм:**
+• Інтеграція з NASA SDO (Solar Dynamics Observatory)
+• Real-time обробка зображень сонця (171Å, 193Å, 304Å, 131Å)
+• Аналіз спалахів класів A, B, C, M, X
+• Відстеження CME (корональні викиди)
+
+**Джерела даних:**
+• NOAA SWPC - сонячний вітер, магнітне поле
+• NASA SDO - зображення сонця
+• GOES - рентгенівські спалахи
+• ACE spacecraft - дані з точки L1
+
+**Алгоритми:**
+• Детекція спалахів через аналіз яскравості УФ
+• Розрахунок часу прибуття CME (швидкість/відстань)
+• Кореляція спалахів з магнітними бурями
+• Предиктивні моделі на історичних даних
+
+**Застосування:**
+• Попередження про магнітні бурі (1-3 дні)
+• Прогноз впливу на GPS та супутники
+• Оцінка ризиків для авіації
+• Планування космічних місій
+
+---
+
+## 3. NEW13 RADAR
+**Тип:** Комплексний радар
+**Призначення:** Мультисенсорна інтеграція
+
+**Механізм:**
+• Агрегація даних з 15+ API одночасно
+• Нормалізація різнорідних даних
+• Виявлення кореляцій між типами даних
+• Побудова графів зв'язків між подіями
+
+**Архітектура:**
+• Event-driven система (WebSockets)
+• Розподілена обробка (parallel processing)
+• Кешування історичних даних
+• Автосинхронізація джерел
+
+**Аналітика:**
+• Cross-correlation для прихованих патернів
+• Часові ряди з автокореляцією
+• Аномалії через z-score > 3
+• Кластеризація подій
+
+**Приклади кореляцій:**
+• Сонячні спалахи → бурі → волатильність ринків
+• Геополітика → економіка → соціум
+• Місячні фази → приливи → сейсміка
+
+---
+
+## 4. HLAM5 SYSTEM
+**Тип:** Атмосферний радар
+**Призначення:** Лазерний аналіз атмосфери
+
+**Принцип:**
+• LIDAR (Light Detection and Ranging)
+• Розсіювання лазера в атмосфері
+• Вимірювання аерозолів та газів
+• Профілювання температури по висоті
+
+**Параметри:**
+• CO2, CH4, O3 на різних висотах
+• Щільність аерозолів (пил, дим, попіл)
+• Швидкість вітру (доплерівський ефект)
+• Температурні інверсії
+
+**Характеристики:**
+• Точність: ±0.1°C, ±2% вологість
+• Висота: 0-15 км
+• Частота: 1 вимір/хвилина
+• Роздільність: 50м по вертикалі
+
+**Застосування:**
+• Якість повітря в містах
+• Відстеження забруднень
+• Прогноз погоди
+• Попередження про смог
+
+---
+
+## 5. GEOPOLITICAL PARSER
+**Тип:** Геополітичний радар
+**Призначення:** Аналіз світових подій
+
+**Механізм:**
+• GDELT (100,000+ новинних джерел, 65 мов)
+• NLP sentiment analysis
+• Геокодування подій
+• Граф взаємодій акторів
+
+**Метрики:**
+• Goldstein Scale (-10 до +10) - конфлікт/співпраця
+• Average Tone (-100 до +100) - емоційний тон
+• Event Count - кількість подій
+• Actor Network - граф зв'язків
+
+**Алгоритми:**
+• Topic modeling (LDA)
+• Named Entity Recognition
+• Time series analysis
+• Event clustering
+
+**Категорії:**
+• Військові конфлікти
+• Дипломатія
+• Санкції та торгові війни
+• Протести
+• Тероризм
+
+---
+
+## 6. ECONOMIC RADAR
+**Тип:** Економічний радар
+**Призначення:** Моніторинг ринків
+
+**Джерела:**
+• Крипто: CoinGecko, Binance (BTC, ETH, top100)
+• Фондові: Yahoo Finance (S&P500, NASDAQ)
+• Валюти: Forex (USD, EUR, GBP, JPY)
+• Товари: Gold, Oil, Gas
+
+**Метрики:**
+• Волатильність (стандартне відхилення)
+• Обсяги торгів
+• RSI, MACD, Bollinger Bands
+• Кореляції між активами
+• Fear & Greed Index
+
+**Алгоритми:**
+• Moving averages (MA50, MA200)
+• Divergence patterns
+• Support/resistance levels
+• Seasonal decomposition
+• Monte Carlo симуляції
+
+**Унікальне:**
+• Кореляція магнітних бур з волатильністю
+• Вплив сонячних циклів на кризи
+• Геополітика → ринки
+• Sentiment analysis Twitter
+
+---
+
+## 7. NEW5 ADVANCED
+**Тип:** AI радар
+**Призначення:** Виявлення патернів
+
+**AI архітектура:**
+• Neural networks для класифікації
+• Random forest для предикції
+• LSTM для часових рядів
+• K-means, DBSCAN для кластерів
+• Reinforcement learning
+
+**Навчання:**
+• Supervised на даних 2010-2026
+• Unsupervised для нових патернів
+• Transfer learning
+• Online learning (постійне оновлення)
+
+**Патерни:**
+• 11-річний сонячний цикл
+• Сезонні коливання
+• Каскадні ефекти
+• Black swan events
+
+**Можливості:**
+• 1M+ data points/сек
+• Real-time inference <100ms
+• Auto-retraining при drift
+• Explainable AI
+
+---
+
+## 8. NEW14 ULTIMATE
+**Тип:** Інтегральний радар
+**Призначення:** Синтез всіх систем
+
+**Концепція:**
+• Єдина картина реальності
+• Синтез космос + земля + економіка + соціум
+• Глобальні зв'язки
+• Холістичний підхід
+
+**Інтеграція:**
+• Data fusion з 8 радарів + 9 лабораторій
+• Нормалізація до єдиної шкали
+• Weighted aggregation
+• Conflict resolution
+
+**Аналітика:**
+• Multi-dimensional (10+ вимірів)
+• Causal inference
+• Network analysis
+• Scenario modeling
+
+**Унікальне:**
+• Resonance detection - синхронізація систем
+• Cascade prediction - ланцюгові реакції
+• Tipping point analysis
+• Emergent phenomena
+
+**Результати:**
+• Прогноз глобальних криз (1-3 місяці)
+• Виявлення "тихих" загроз
+• Оптимальні моменти для рішень
+• Zeitgeist analysis
+
+---
+
+# ЛАБОРАТОРІЇ (9 ПРОЕКТІВ)
+
+## SUN IBONARIUM
+Комплексне вивчення сонця. NASA SDO інтеграція, 10+ спектрів, 3D моделювання CME, прогнози бур, вплив на клімат.
+
+## PLANET RADAR
+Небесна механіка, ефемериди JPL, 3D орбіти, затемнення, парад планет, астероїди.
+
+## MOON IBONARIUM
+Фази місяця, приливи, біоритми, місячний календар, вплив на агро.
+
+## ECOLOGY RADAR
+Якість повітря (PM2.5, CO2, NOx), вода (pH, метали), супутники Sentinel, тренди забруднення.
+
+## MAGNET LAB
+Магнітне поле землі, Kp індекс, іоносфера, GIC струми, aurora, вплив на GPS.
+
+## CRYPTO LAB
+BTC/ETH аналіз, волатильність, кореляція з космосом, LSTM предикція, sentiment Twitter.
+
+## OCEAN LAB
+Температура океану, течії, рівень моря, Ель-Ніньо, закислення, буї ARGO.
+
+## HUMANITY LAB
+Демографія, урбанізація, UN data, WHO статистика, соцмережі NLP, глобальні тренди.
+
+## AGRO UA LAB
+Погода для фермерів, місячний календар, NDVI супутники, прогноз врожаю, датчики грунту.
+`;
+
+        // ===== DATA =====
+        let data = { kp: 0, wind: 0, density: 0, bz: 0, bt: 0 };
+
+        async function fetchData() {
+            try {
+                const [kpRes, plasmaRes, magRes] = await Promise.all([
+                    fetch('https://services.swpc.noaa.gov/products/noaa-planetary-k-index.json'),
+                    fetch('https://services.swpc.noaa.gov/products/solar-wind/plasma-5-minute.json'),
+                    fetch('https://services.swpc.noaa.gov/products/solar-wind/mag-5-minute.json')
+                ]);
+
+                const kpData = await kpRes.json();
+                const plasmaData = await plasmaRes.json();
+                const magData = await magRes.json();
+
+                data.kp = parseFloat(kpData[kpData.length - 1][1]) || 0;
+                data.wind = parseFloat(plasmaData[plasmaData.length - 1][2]) || 0;
+                data.density = parseFloat(plasmaData[plasmaData.length - 1][1]) || 0;
+                data.bz = parseFloat(magData[magData.length - 1][3]) || 0;
+                data.bt = parseFloat(magData[magData.length - 1][6]) || 0;
+
+                updateDisplay();
+                document.getElementById('statusText').textContent = 'online :: data updated';
+            } catch (e) {
+                document.getElementById('statusText').textContent = 'online :: connection error';
+            }
+        }
+
+        function updateDisplay() {
+            const getStatus = (val, thresholds) => {
+                if (val >= thresholds[1]) return 'alert';
+                if (val >= thresholds[0]) return 'warn';
+                return 'ok';
+            };
+
+            const statusText = { ok: 'norm', warn: 'watch', alert: 'critical' };
+
+            const kpStatus = getStatus(data.kp, [4, 5]);
+            const windStatus = getStatus(data.wind, [500, 600]);
+            const bzStatus = getStatus(Math.abs(data.bz), [5, 10]);
+
+            document.getElementById('dataDisplay').innerHTML = `
+    <div class="data-row">
+      <span class="data-label">kp index</span>
+      <span class="data-value">${data.kp.toFixed(1)}<span class="status-indicator status-${kpStatus}">${statusText[kpStatus]}</span></span>
+    </div>
+    <div class="data-row">
+      <span class="data-label">solar wind</span>
+      <span class="data-value">${data.wind.toFixed(0)} km/s<span class="status-indicator status-${windStatus}">${statusText[windStatus]}</span></span>
+    </div>
+    <div class="data-row">
+      <span class="data-label">bz field</span>
+      <span class="data-value">${data.bz.toFixed(1)} nT<span class="status-indicator status-${bzStatus}">${statusText[bzStatus]}</span></span>
+    </div>
+  `;
+        }
+
+        fetchData();
+        setInterval(fetchData, 5 * 60 * 1000);
+
+        // ===== CHAT =====
+        function sendMsg() {
+            const input = document.getElementById('chatInput');
+            const msg = input.value.trim();
+            if (!msg) return;
+
+            addMsg(msg, 'user');
+            input.value = '';
+
+            setTimeout(() => {
+                const response = getResponse(msg);
+                addMsg(response, 'bot');
+            }, 500);
+        }
+
+        function addMsg(text, type) {
+            const chat = document.getElementById('chatMessages');
+            const time = new Date().toLocaleTimeString('uk-UA');
+
+            const div = document.createElement('div');
+            div.className = `message msg-${type}`;
+            div.innerHTML = `
+    <div class="msg-time">${type === 'user' ? 'you' : 'laborant.ai1'} :: ${time}</div>
+    <div>${text}</div>
+  `;
+
+            chat.appendChild(div);
+            chat.scrollTop = chat.scrollHeight;
+        }
+
+        function getResponse(msg) {
+            const m = msg.toLowerCase();
+
+            // Радари
+            if (m.includes('test2')) return KNOWLEDGE.split('## 1. TEST2')[1].split('---')[0];
+            if (m.includes('soncemetr') || m.includes('сонце')) return KNOWLEDGE.split('## 2. SONCEMETR')[1].split('---')[0];
+            if (m.includes('new13')) return KNOWLEDGE.split('## 3. NEW13')[1].split('---')[0];
+            if (m.includes('hlam5')) return KNOWLEDGE.split('## 4. HLAM5')[1].split('---')[0];
+            if (m.includes('geopolitical') || m.includes('геополітик')) return KNOWLEDGE.split('## 5. GEOPOLITICAL')[1].split('---')[0];
+            if (m.includes('economic') || m.includes('економ')) return KNOWLEDGE.split('## 6. ECONOMIC')[1].split('---')[0];
+            if (m.includes('new5')) return KNOWLEDGE.split('## 7. NEW5')[1].split('---')[0];
+            if (m.includes('new14')) return KNOWLEDGE.split('## 8. NEW14')[1].split('---')[0];
+
+            // Лабораторії
+            if (m.includes('sun') && m.includes('ibonarium')) return KNOWLEDGE.split('## SUN IBONARIUM')[1].split('##')[0];
+            if (m.includes('planet')) return KNOWLEDGE.split('## PLANET RADAR')[1].split('##')[0];
+            if (m.includes('moon')) return KNOWLEDGE.split('## MOON IBONARIUM')[1].split('##')[0];
+            if (m.includes('ecology')) return KNOWLEDGE.split('## ECOLOGY RADAR')[1].split('##')[0];
+            if (m.includes('magnet')) return KNOWLEDGE.split('## MAGNET LAB')[1].split('##')[0];
+            if (m.includes('crypto')) return KNOWLEDGE.split('## CRYPTO LAB')[1].split('##')[0];
+            if (m.includes('ocean')) return KNOWLEDGE.split('## OCEAN LAB')[1].split('##')[0];
+            if (m.includes('humanity')) return KNOWLEDGE.split('## HUMANITY LAB')[1].split('##')[0];
+            if (m.includes('agro')) return KNOWLEDGE.split('## AGRO UA LAB')[1].split('##')[0];
+
+            // Загальні
+            if (m.includes('радар') || m.includes('radar')) {
+                return `🎯 CORE РАДАРИ:\n\n1. TEST2 - тестовий\n2. SONCEMETR - сонячний\n3. NEW13 - комплексний\n4. HLAM5 - атмосферний\n5. GEOPOLITICAL - геополітика\n6. ECONOMIC - економіка\n7. NEW5 - AI\n8. NEW14 - інтегральний\n\nзапитайте про конкретний для детального опису!`;
+            }
+
+            if (m.includes('лабораторії') || m.includes('проект')) {
+                return `🔬 ЛАБОРАТОРІЇ:\n\n• SUN IBONARIUM\n• PLANET RADAR\n• MOON IBONARIUM\n• ECOLOGY RADAR\n• MAGNET LAB\n• CRYPTO LAB\n• OCEAN LAB\n• HUMANITY LAB\n• AGRO UA LAB\n\nзапитайте про конкретну!`;
+            }
+
+            if (m.includes('kp')) {
+                return `kp індекс: ${data.kp.toFixed(1)}\n\n${data.kp >= 5 ? '⚠️ магнітна буря' : '✓ спокійно'}\n\nджерела: soncemetr, magnet.lab`;
+            }
+
+            return `маю детальні знання про:\n• 8 core радарів\n• 9 лабораторій\n\nзапитайте про конкретний радар (наприклад "soncemetr") або лабораторію!`;
+        }
+
+        document.getElementById('chatInput').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') sendMsg();
+        });
+
+        // ===== QUICK ACTIONS =====
+        function quickAction(action) {
+            switch (action) {
+                case 'radars':
+                    addMsg('🎯 CORE РАДАРИ:\n\n1. TEST2 - тестовий\n2. SONCEMETR - сонячний\n3. NEW13 - комплексний\n4. HLAM5 - атмосферний\n5. GEOPOLITICAL - геополітика\n6. ECONOMIC - економіка\n7. NEW5 - AI\n8. NEW14 - інтегральний\n\nнапишіть назву для детального опису!', 'bot');
+                    break;
+                case 'labs':
+                    addMsg('🔬 ЛАБОРАТОРІЇ:\n\n• SUN IBONARIUM\n• PLANET RADAR\n• MOON IBONARIUM\n• ECOLOGY RADAR\n• MAGNET LAB\n• CRYPTO LAB\n• OCEAN LAB\n• HUMANITY LAB\n• AGRO UA LAB\n\nнапишіть назву!', 'bot');
+                    break;
+                case 'report':
+                    addMsg(`📊 ЗВІТ:\n\n• kp: ${data.kp.toFixed(1)}\n• вітер: ${data.wind.toFixed(0)} км/с\n• bz: ${data.bz.toFixed(1)} nT\n\nстатус: ${data.kp >= 5 ? '⚠️ буря' : '✓ норма'}`, 'bot');
+                    break;
+                case 'help':
+                    addMsg('❓ ДОПОМОГА:\n\nнапишіть назву радара або лабораторії для детального опису з механізмами, алгоритмами та застосуванням.\n\nприклади:\n• "soncemetr"\n• "new14"\n• "geopolitical"\n• "crypto"', 'bot');
+                    break;
+            }
+        }
+    </script>
+
+</body>
+
+</html>

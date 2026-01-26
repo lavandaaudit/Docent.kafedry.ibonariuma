@@ -3,10 +3,8 @@
 
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <meta name="referrer" content="no-referrer">
-    <meta name="robots" content="noindex,nofollow">
-    <title>ibonarium.laborant.ai1 :: full knowledge base</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Docent Kafedry Ibonarium</title>
 
     <style>
         * {
@@ -22,7 +20,7 @@
             background: #000;
             color: #4dd2ff;
             font-family: "Courier New", monospace;
-            overflow-x: hidden;
+            overflow: hidden;
         }
 
         canvas {
@@ -31,85 +29,43 @@
             z-index: 0;
         }
 
-        .formula-layer {
-            position: fixed;
-            inset: 0;
-            pointer-events: none;
-            z-index: 1;
-        }
-
-        .formula {
-            position: absolute;
-            color: rgba(77, 210, 255, 0.4);
-            font-size: 12px;
-            white-space: nowrap;
-            opacity: 0;
-            animation: floatFormula linear forwards;
-            text-shadow: 0 0 8px rgba(77, 210, 255, 0.3);
-        }
-
-        @keyframes floatFormula {
-            0% {
-                opacity: 0;
-                transform: translateY(20px);
-            }
-
-            10% {
-                opacity: 1;
-            }
-
-            90% {
-                opacity: 1;
-            }
-
-            100% {
-                opacity: 0;
-                transform: translateY(-120px);
-            }
-        }
-
         .container {
             position: relative;
             z-index: 2;
-            max-width: 900px;
-            margin: 0 auto;
-            padding: 40px 20px;
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
+            height: 100vh;
+            display: grid;
+            grid-template-columns: 350px 1fr;
+            grid-template-rows: 60px 1fr;
+            gap: 20px;
+            padding: 20px;
         }
 
         .header {
-            text-align: center;
-            margin-bottom: 40px;
-            padding-bottom: 20px;
-            border-bottom: 1px solid rgba(77, 210, 255, 0.2);
+            grid-column: 1 / -1;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 10px;
         }
 
-        .logo {
-            font-size: 28px;
+        .title {
+            font-size: 20px;
             letter-spacing: 3px;
-            margin-bottom: 8px;
-            text-shadow: 0 0 15px rgba(77, 210, 255, 0.6);
+            text-shadow: 0 0 15px rgba(77, 210, 255, 0.8);
         }
 
-        .subtitle {
+        .status-bar {
+            display: flex;
+            gap: 25px;
             font-size: 11px;
             opacity: 0.6;
-            letter-spacing: 2px;
-        }
-
-        .status {
-            margin-top: 15px;
-            font-size: 10px;
-            opacity: 0.5;
         }
 
         .status-dot {
             display: inline-block;
             width: 6px;
             height: 6px;
-            background: #4dd2ff;
+            background: #0f0;
             border-radius: 50%;
             margin-right: 5px;
             animation: pulse 2s infinite;
@@ -127,31 +83,157 @@
             }
         }
 
-        .data-section {
-            background: rgba(0, 20, 40, 0.3);
-            border: 1px solid rgba(77, 210, 255, 0.2);
-            border-radius: 5px;
-            padding: 20px;
-            margin-bottom: 25px;
+        .left-panel {
+            display: flex;
+            flex-direction: column;
+            gap: 30px;
         }
 
-        .section-title {
-            font-size: 13px;
+        .robot-section {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .robot {
+            width: 220px;
+            height: 220px;
+            position: relative;
             margin-bottom: 15px;
-            opacity: 0.8;
-            letter-spacing: 1px;
+        }
+
+        .robot-head {
+            width: 130px;
+            height: 130px;
+            background: linear-gradient(135deg, rgba(77, 210, 255, 0.3), rgba(77, 210, 255, 0.05));
+            border: 2px solid #4dd2ff;
+            border-radius: 20px;
+            position: absolute;
+            top: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            animation: float 3s ease-in-out infinite;
+            box-shadow: 0 0 30px rgba(77, 210, 255, 0.4);
+        }
+
+        @keyframes float {
+
+            0%,
+            100% {
+                transform: translateX(-50%) translateY(0);
+            }
+
+            50% {
+                transform: translateX(-50%) translateY(-12px);
+            }
+        }
+
+        .robot-eye {
+            width: 28px;
+            height: 28px;
+            background: #4dd2ff;
+            border-radius: 50%;
+            position: absolute;
+            top: 38px;
+            box-shadow: 0 0 20px #4dd2ff;
+            animation: blink 4s infinite;
+        }
+
+        .robot-eye.left {
+            left: 28px;
+        }
+
+        .robot-eye.right {
+            right: 28px;
+        }
+
+        @keyframes blink {
+
+            0%,
+            48%,
+            52%,
+            100% {
+                opacity: 1;
+            }
+
+            50% {
+                opacity: 0;
+            }
+        }
+
+        .robot-antenna {
+            width: 3px;
+            height: 35px;
+            background: #4dd2ff;
+            position: absolute;
+            top: -35px;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+
+        .robot-antenna::after {
+            content: '';
+            width: 12px;
+            height: 12px;
+            background: #4dd2ff;
+            border-radius: 50%;
+            position: absolute;
+            top: -12px;
+            left: 50%;
+            transform: translateX(-50%);
+            box-shadow: 0 0 25px #4dd2ff;
+            animation: pulse 1s infinite;
+        }
+
+        .robot-mouth {
+            width: 65px;
+            height: 3px;
+            background: #4dd2ff;
+            position: absolute;
+            bottom: 32px;
+            left: 50%;
+            transform: translateX(-50%);
+            border-radius: 2px;
+        }
+
+        .robot-body {
+            width: 110px;
+            height: 85px;
+            background: rgba(77, 210, 255, 0.15);
+            border: 2px solid #4dd2ff;
+            border-radius: 12px;
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            box-shadow: 0 0 20px rgba(77, 210, 255, 0.3);
+        }
+
+        .robot-name {
+            font-size: 16px;
+            text-align: center;
+            opacity: 0.9;
+            margin-bottom: 5px;
+            letter-spacing: 2px;
+        }
+
+        .robot-title {
+            font-size: 11px;
+            text-align: center;
+            opacity: 0.5;
+        }
+
+        .data-compact {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
         }
 
         .data-row {
             display: flex;
             justify-content: space-between;
-            padding: 8px 0;
-            border-bottom: 1px solid rgba(77, 210, 255, 0.1);
-            font-size: 12px;
-        }
-
-        .data-row:last-child {
-            border-bottom: none;
+            padding: 6px 0;
+            font-size: 11px;
         }
 
         .data-label {
@@ -164,10 +246,10 @@
 
         .status-indicator {
             display: inline-block;
-            padding: 2px 8px;
-            border-radius: 3px;
-            font-size: 9px;
-            margin-left: 8px;
+            padding: 2px 6px;
+            border-radius: 2px;
+            font-size: 8px;
+            margin-left: 6px;
         }
 
         .status-ok {
@@ -185,29 +267,57 @@
             color: #f33;
         }
 
-        .chat-box {
-            background: rgba(0, 20, 40, 0.3);
-            border: 1px solid rgba(77, 210, 255, 0.2);
-            border-radius: 5px;
-            padding: 20px;
-            margin-bottom: 25px;
-            flex: 1;
+        .quick-actions {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+            margin-top: 15px;
+        }
+
+        .action-btn {
+            background: rgba(77, 210, 255, 0.1);
+            border: 1px solid rgba(77, 210, 255, 0.3);
+            color: #4dd2ff;
+            padding: 10px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-family: "Courier New", monospace;
+            font-size: 10px;
+            transition: 0.3s;
+            text-align: center;
+        }
+
+        .action-btn:hover {
+            background: rgba(77, 210, 255, 0.2);
+            border-color: #4dd2ff;
+            box-shadow: 0 0 15px rgba(77, 210, 255, 0.4);
+        }
+
+        .chat-panel {
             display: flex;
             flex-direction: column;
+            padding: 10px 0;
+        }
+
+        .chat-title {
+            font-size: 14px;
+            margin-bottom: 15px;
+            opacity: 0.7;
+            text-align: center;
+            letter-spacing: 1px;
         }
 
         .chat-messages {
             flex: 1;
             overflow-y: auto;
             margin-bottom: 15px;
-            max-height: 500px;
-            min-height: 300px;
+            padding-right: 10px;
         }
 
         .message {
             margin-bottom: 15px;
-            font-size: 11px;
-            line-height: 1.7;
+            font-size: 13px;
+            line-height: 1.8;
             animation: fadeIn 0.3s;
         }
 
@@ -226,7 +336,7 @@
         .msg-time {
             font-size: 9px;
             opacity: 0.4;
-            margin-bottom: 3px;
+            margin-bottom: 4px;
         }
 
         .msg-bot {
@@ -240,83 +350,49 @@
 
         .chat-input-box {
             display: flex;
-            gap: 8px;
+            gap: 10px;
         }
 
         .chat-input {
             flex: 1;
-            background: rgba(0, 10, 20, 0.5);
+            background: rgba(0, 20, 40, 0.3);
             border: 1px solid rgba(77, 210, 255, 0.3);
             color: #4dd2ff;
-            padding: 10px;
-            border-radius: 3px;
+            padding: 12px;
+            border-radius: 5px;
             font-family: "Courier New", monospace;
-            font-size: 12px;
+            font-size: 13px;
         }
 
         .chat-input:focus {
             outline: none;
             border-color: #4dd2ff;
+            box-shadow: 0 0 15px rgba(77, 210, 255, 0.3);
         }
 
         .send-btn {
-            background: transparent;
+            background: rgba(77, 210, 255, 0.1);
             border: 1px solid #4dd2ff;
             color: #4dd2ff;
-            padding: 10px 20px;
-            border-radius: 3px;
+            padding: 12px 20px;
+            border-radius: 5px;
             cursor: pointer;
             font-family: "Courier New", monospace;
-            font-size: 12px;
+            font-size: 13px;
             transition: 0.3s;
         }
 
         .send-btn:hover {
-            background: rgba(77, 210, 255, 0.1);
-            box-shadow: 0 0 10px rgba(77, 210, 255, 0.4);
-        }
-
-        .actions {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
-            gap: 10px;
-            margin-bottom: 25px;
-        }
-
-        .action-btn {
-            background: rgba(0, 20, 40, 0.3);
-            border: 1px solid rgba(77, 210, 255, 0.2);
-            color: #4dd2ff;
-            padding: 12px;
-            border-radius: 3px;
-            cursor: pointer;
-            font-family: "Courier New", monospace;
-            font-size: 11px;
-            transition: 0.3s;
-            text-align: center;
-        }
-
-        .action-btn:hover {
-            background: rgba(77, 210, 255, 0.1);
-            border-color: #4dd2ff;
-            box-shadow: 0 0 10px rgba(77, 210, 255, 0.3);
-        }
-
-        .footer {
-            text-align: center;
-            font-size: 9px;
-            opacity: 0.3;
-            margin-top: 20px;
-            padding-top: 20px;
-            border-top: 1px solid rgba(77, 210, 255, 0.1);
+            background: rgba(77, 210, 255, 0.2);
+            box-shadow: 0 0 20px rgba(77, 210, 255, 0.5);
         }
 
         ::-webkit-scrollbar {
-            width: 6px;
+            width: 5px;
         }
 
         ::-webkit-scrollbar-track {
-            background: rgba(0, 20, 40, 0.5);
+            background: transparent;
         }
 
         ::-webkit-scrollbar-thumb {
@@ -324,17 +400,10 @@
             border-radius: 3px;
         }
 
-        @media (max-width: 600px) {
-            .logo {
-                font-size: 22px;
-            }
-
-            .actions {
+        @media (max-width: 1200px) {
+            .container {
                 grid-template-columns: 1fr;
-            }
-
-            .message {
-                font-size: 10px;
+                grid-template-rows: 60px 250px 1fr;
             }
         }
     </style>
@@ -343,62 +412,70 @@
 <body>
 
     <canvas id="stars"></canvas>
-    <div class="formula-layer" id="formulaLayer"></div>
 
     <div class="container">
 
         <div class="header">
-            <div class="logo">ibonarium.laborant.ai1</div>
-            <div class="subtitle">full knowledge base :: expert system</div>
-            <div class="status">
-                <span class="status-dot"></span>
-                <span id="statusText">online :: ready</span>
+            <div class="title">DOCENT KAFEDRY IBONARIUM</div>
+            <div class="status-bar">
+                <span><span class="status-dot"></span>ONLINE</span>
+                <span id="time">--:--:--</span>
+                <span id="dataStatus">DATA: OK</span>
             </div>
         </div>
 
-        <div class="data-section">
-            <div class="section-title">⚡ space weather</div>
-            <div id="dataDisplay">
+        <div class="left-panel">
+            <div class="robot-section">
+                <div class="robot">
+                    <div class="robot-head">
+                        <div class="robot-antenna"></div>
+                        <div class="robot-eye left"></div>
+                        <div class="robot-eye right"></div>
+                        <div class="robot-mouth"></div>
+                    </div>
+                    <div class="robot-body"></div>
+                </div>
+                <div class="robot-name">LABORANT.AI1</div>
+                <div class="robot-title">expert system v3.0</div>
+            </div>
+
+            <div class="data-compact" id="dataDisplay">
                 <div class="data-row">
                     <span class="data-label">loading...</span>
                     <span class="data-value">—</span>
                 </div>
             </div>
+
+            <div class="quick-actions">
+                <button class="action-btn" onclick="quickAction('radars')">радари</button>
+                <button class="action-btn" onclick="quickAction('labs')">лабораторії</button>
+                <button class="action-btn" onclick="quickAction('report')">звіт</button>
+                <button class="action-btn" onclick="quickAction('help')">допомога</button>
+            </div>
         </div>
 
-        <div class="chat-box">
-            <div class="section-title">💬 expert assistant</div>
+        <div class="chat-panel">
+            <div class="chat-title">💬 КОНСУЛЬТАЦІЯ З ДОЦЕНТОМ</div>
             <div class="chat-messages" id="chatMessages">
                 <div class="message msg-bot">
                     <div class="msg-time">system</div>
-                    <div>вітаю. я laborant.ai1 - експертна система ibonarium.<br><br>
-                        маю детальні знання про:<br>
-                        • 8 core радарів з повними описами механізмів<br>
-                        • 9 лабораторій з технічними деталями<br>
-                        • алгоритми, джерела даних, застосування<br><br>
-                        запитайте про будь-який радар або проект для детального опису! 📚</div>
+                    <div>вітаю! я доцент кафедри ibonarium.<br><br>
+                        маю повні знання про:<br>
+                        • 8 core радарів (механізми, алгоритми)<br>
+                        • 9 лабораторій (технології, дані)<br>
+                        • космічну погоду в real-time<br><br>
+                        задавайте питання! 📚</div>
                 </div>
             </div>
             <div class="chat-input-box">
-                <input type="text" class="chat-input" id="chatInput" placeholder="запитайте про радар або проект...">
-                <button class="send-btn" onclick="sendMsg()">send</button>
+                <input type="text" class="chat-input" id="chatInput"
+                    placeholder="запитайте про радар або лабораторію...">
+                <button class="send-btn" onclick="sendMsg()">→</button>
             </div>
-        </div>
-
-        <div class="actions">
-            <button class="action-btn" onclick="quickAction('radars')">🎯 радари</button>
-            <button class="action-btn" onclick="quickAction('labs')">🔬 лабораторії</button>
-            <button class="action-btn" onclick="quickAction('report')">📊 звіт</button>
-            <button class="action-btn" onclick="quickAction('help')">❓ допомога</button>
-        </div>
-
-        <div class="footer">
-            ibonarium project 2026 :: full knowledge base v3.0
         </div>
 
     </div>
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/markdown-it/13.0.1/markdown-it.min.js"></script>
     <script>
         // ===== STARS =====
         const s = document.getElementById("stars");
@@ -408,7 +485,7 @@
         function resize() {
             W = s.width = innerWidth;
             H = s.height = innerHeight;
-            stars = Array.from({ length: 200 }, () => ({
+            stars = Array.from({ length: 150 }, () => ({
                 x: Math.random() * W,
                 y: Math.random() * H,
                 z: Math.random() * W
@@ -429,7 +506,7 @@
                 const x = (st.x - W / 2) * k + W / 2;
                 const y = (st.y - H / 2) * k + H / 2;
                 if (x > 0 && x < W && y > 0 && y < H) {
-                    const size = (1 - st.z / W) * 2;
+                    const size = (1 - st.z / W) * 1.5;
                     ctx.fillRect(x, y, size, size);
                 }
             });
@@ -437,26 +514,9 @@
         }
         draw();
 
-        // ===== FORMULAS =====
-        const formulas = [
-            "E = mc²", "F = ma", "∇·E = ρ/ε₀", "∇×B = μ₀J",
-            "Δx·Δp ≥ ħ/2", "iħ∂ψ/∂t = Ĥψ", "S = k·lnΩ",
-            "e^{iπ} + 1 = 0", "∂L/∂q − d/dt(∂L/∂q̇) = 0",
-            "R_{μν} − ½Rg_{μν} = 8πT_{μν}"
-        ];
-        const layer = document.getElementById("formulaLayer");
-
-        function spawnFormula() {
-            const f = document.createElement("div");
-            f.className = "formula";
-            f.textContent = formulas[Math.floor(Math.random() * formulas.length)];
-            f.style.left = Math.random() * 80 + 10 + "%";
-            f.style.top = Math.random() * 80 + 10 + "%";
-            f.style.animationDuration = (15 + Math.random() * 10) + "s";
-            layer.appendChild(f);
-            setTimeout(() => f.remove(), 25000);
-        }
-        setInterval(spawnFormula, 3000);
+        setInterval(() => {
+            document.getElementById('time').textContent = new Date().toLocaleTimeString('uk-UA');
+        }, 1000);
 
         // ===== KNOWLEDGE BASE =====
         const KNOWLEDGE = `
@@ -751,9 +811,9 @@ BTC/ETH аналіз, волатильність, кореляція з косм
                 data.bt = parseFloat(magData[magData.length - 1][6]) || 0;
 
                 updateDisplay();
-                document.getElementById('statusText').textContent = 'online :: data updated';
+                document.getElementById('dataStatus').textContent = 'DATA: OK';
             } catch (e) {
-                document.getElementById('statusText').textContent = 'online :: connection error';
+                document.getElementById('dataStatus').textContent = 'DATA: ERR';
             }
         }
 
@@ -764,7 +824,7 @@ BTC/ETH аналіз, волатильність, кореляція з косм
                 return 'ok';
             };
 
-            const statusText = { ok: 'norm', warn: 'watch', alert: 'critical' };
+            const statusText = { ok: 'norm', warn: 'watch', alert: 'crit' };
 
             const kpStatus = getStatus(data.kp, [4, 5]);
             const windStatus = getStatus(data.wind, [500, 600]);
@@ -811,7 +871,7 @@ BTC/ETH аналіз, волатильність, кореляція з косм
             const div = document.createElement('div');
             div.className = `message msg-${type}`;
             div.innerHTML = `
-    <div class="msg-time">${type === 'user' ? 'you' : 'laborant.ai1'} :: ${time}</div>
+    <div class="msg-time">${type === 'user' ? 'you' : 'docent'} :: ${time}</div>
     <div>${text}</div>
   `;
 
@@ -822,7 +882,6 @@ BTC/ETH аналіз, волатильність, кореляція з косм
         function getResponse(msg) {
             const m = msg.toLowerCase();
 
-            // Радари
             if (m.includes('test2')) return KNOWLEDGE.split('## 1. TEST2')[1].split('---')[0];
             if (m.includes('soncemetr') || m.includes('сонце')) return KNOWLEDGE.split('## 2. SONCEMETR')[1].split('---')[0];
             if (m.includes('new13')) return KNOWLEDGE.split('## 3. NEW13')[1].split('---')[0];
@@ -832,7 +891,6 @@ BTC/ETH аналіз, волатильність, кореляція з косм
             if (m.includes('new5')) return KNOWLEDGE.split('## 7. NEW5')[1].split('---')[0];
             if (m.includes('new14')) return KNOWLEDGE.split('## 8. NEW14')[1].split('---')[0];
 
-            // Лабораторії
             if (m.includes('sun') && m.includes('ibonarium')) return KNOWLEDGE.split('## SUN IBONARIUM')[1].split('##')[0];
             if (m.includes('planet')) return KNOWLEDGE.split('## PLANET RADAR')[1].split('##')[0];
             if (m.includes('moon')) return KNOWLEDGE.split('## MOON IBONARIUM')[1].split('##')[0];
@@ -843,9 +901,8 @@ BTC/ETH аналіз, волатильність, кореляція з косм
             if (m.includes('humanity')) return KNOWLEDGE.split('## HUMANITY LAB')[1].split('##')[0];
             if (m.includes('agro')) return KNOWLEDGE.split('## AGRO UA LAB')[1].split('##')[0];
 
-            // Загальні
             if (m.includes('радар') || m.includes('radar')) {
-                return `🎯 CORE РАДАРИ:\n\n1. TEST2 - тестовий\n2. SONCEMETR - сонячний\n3. NEW13 - комплексний\n4. HLAM5 - атмосферний\n5. GEOPOLITICAL - геополітика\n6. ECONOMIC - економіка\n7. NEW5 - AI\n8. NEW14 - інтегральний\n\nзапитайте про конкретний для детального опису!`;
+                return `🎯 CORE РАДАРИ:\n\n1. TEST2 - тестовий\n2. SONCEMETR - сонячний\n3. NEW13 - комплексний\n4. HLAM5 - атмосферний\n5. GEOPOLITICAL - геополітика\n6. ECONOMIC - економіка\n7. NEW5 - AI\n8. NEW14 - інтегральний\n\nзапитайте про конкретний!`;
             }
 
             if (m.includes('лабораторії') || m.includes('проект')) {
@@ -856,27 +913,26 @@ BTC/ETH аналіз, волатильність, кореляція з косм
                 return `kp індекс: ${data.kp.toFixed(1)}\n\n${data.kp >= 5 ? '⚠️ магнітна буря' : '✓ спокійно'}\n\nджерела: soncemetr, magnet.lab`;
             }
 
-            return `маю детальні знання про:\n• 8 core радарів\n• 9 лабораторій\n\nзапитайте про конкретний радар (наприклад "soncemetr") або лабораторію!`;
+            return `маю детальні знання про:\n• 8 core радарів\n• 9 лабораторій\n\nзапитайте про конкретний (наприклад "soncemetr")!`;
         }
 
         document.getElementById('chatInput').addEventListener('keypress', (e) => {
             if (e.key === 'Enter') sendMsg();
         });
 
-        // ===== QUICK ACTIONS =====
         function quickAction(action) {
             switch (action) {
                 case 'radars':
-                    addMsg('🎯 CORE РАДАРИ:\n\n1. TEST2 - тестовий\n2. SONCEMETR - сонячний\n3. NEW13 - комплексний\n4. HLAM5 - атмосферний\n5. GEOPOLITICAL - геополітика\n6. ECONOMIC - економіка\n7. NEW5 - AI\n8. NEW14 - інтегральний\n\nнапишіть назву для детального опису!', 'bot');
+                    addMsg('🎯 CORE РАДАРИ:\n\n1. TEST2\n2. SONCEMETR\n3. NEW13\n4. HLAM5\n5. GEOPOLITICAL\n6. ECONOMIC\n7. NEW5\n8. NEW14\n\nнапишіть назву!', 'bot');
                     break;
                 case 'labs':
-                    addMsg('🔬 ЛАБОРАТОРІЇ:\n\n• SUN IBONARIUM\n• PLANET RADAR\n• MOON IBONARIUM\n• ECOLOGY RADAR\n• MAGNET LAB\n• CRYPTO LAB\n• OCEAN LAB\n• HUMANITY LAB\n• AGRO UA LAB\n\nнапишіть назву!', 'bot');
+                    addMsg('🔬 ЛАБОРАТОРІЇ:\n\n• SUN IBONARIUM\n• PLANET RADAR\n• MOON IBONARIUM\n• ECOLOGY RADAR\n• MAGNET LAB\n• CRYPTO LAB\n• OCEAN LAB\n• HUMANITY LAB\n• AGRO UA LAB', 'bot');
                     break;
                 case 'report':
                     addMsg(`📊 ЗВІТ:\n\n• kp: ${data.kp.toFixed(1)}\n• вітер: ${data.wind.toFixed(0)} км/с\n• bz: ${data.bz.toFixed(1)} nT\n\nстатус: ${data.kp >= 5 ? '⚠️ буря' : '✓ норма'}`, 'bot');
                     break;
                 case 'help':
-                    addMsg('❓ ДОПОМОГА:\n\nнапишіть назву радара або лабораторії для детального опису з механізмами, алгоритмами та застосуванням.\n\nприклади:\n• "soncemetr"\n• "new14"\n• "geopolitical"\n• "crypto"', 'bot');
+                    addMsg('❓ ДОПОМОГА:\n\nнапишіть назву радара або лабораторії.\n\nприклади:\n• "soncemetr"\n• "new14"\n• "crypto"', 'bot');
                     break;
             }
         }

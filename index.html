@@ -21,7 +21,6 @@
             color: #4dd2ff;
             font-family: "Courier New", monospace;
             overflow: hidden;
-            /* Prevent elasticity on mobile */
             overscroll-behavior: none;
         }
 
@@ -361,6 +360,53 @@
             text-align: right;
         }
 
+        /* NEW: Clickable links in chat */
+        .cmd-link {
+            display: inline-block;
+            cursor: pointer;
+            color: #0f0;
+            /* Terminal Green */
+            border-bottom: 1px dashed rgba(0, 255, 0, 0.3);
+            padding: 0 4px;
+            margin: 2px 0;
+            transition: all 0.2s;
+        }
+
+        .cmd-link:hover {
+            background: rgba(0, 255, 0, 0.15);
+            border-bottom-style: solid;
+        }
+
+        .project-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+            gap: 8px;
+            margin-top: 10px;
+        }
+
+        .project-item {
+            border: 1px solid rgba(77, 210, 255, 0.15);
+            background: rgba(0, 20, 40, 0.4);
+            padding: 8px 12px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 11px;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+        }
+
+        .project-item:before {
+            content: '>';
+            margin-right: 6px;
+            opacity: 0.5;
+        }
+
+        .project-item:hover {
+            border-color: #4dd2ff;
+            background: rgba(77, 210, 255, 0.1);
+        }
+
         .chat-input-box {
             display: flex;
             gap: 10px;
@@ -531,6 +577,10 @@
             .container {
                 grid-template-rows: auto auto 1fr;
             }
+
+            .project-grid {
+                grid-template-columns: 1fr 1fr;
+            }
         }
     </style>
 </head>
@@ -562,7 +612,7 @@
                     <div class="robot-body"></div>
                 </div>
                 <div class="robot-name">LABORANT.AI1</div>
-                <div class="robot-title">expert system v3.1</div>
+                <div class="robot-title">expert system v3.2</div>
             </div>
 
             <div class="data-compact" id="dataDisplay">
@@ -595,7 +645,8 @@
                         • 8 core радарів<br>
                         • Космічна погода real-time<br><br>
 
-                        Задавайте питання! 📚</div>
+                        <b>Оберіть "ПРОЕКТИ" або задайте питання! 📚</b>
+                    </div>
                 </div>
             </div>
             <div class="chat-input-box">
@@ -648,6 +699,20 @@
         setInterval(() => {
             document.getElementById('time').textContent = new Date().toLocaleTimeString('uk-UA');
         }, 1000);
+
+        // ===== PROJECT LIST DATA =====
+        const projects = [
+            'sun.ibonarium', 'planet.radar', 'moon.ibonarium', 'ecology.radar',
+            '.translator', '.magnet.lab', 'cripto.lab.live', 'lavanda.soft',
+            'ibonarium.tv', 'solar.stability', 'i.modular.1.3', 'i.drum.32',
+            'eco.system', 'ocean.lab', 'humanity.lab', 'i.modularXIII',
+            'agro.ua.lab', 'ARHIVE.2026'
+        ];
+
+        const coreRadars = [
+            'TEST2.ORIGINAL', 'SONCEMETR 2026', 'NEW13 RADAR', 'HLAM5 SYSTEM',
+            'GEOPOLITICAL PARSER', 'ECONOMIC RADAR', 'NEW5 ADVANCED', 'NEW14 ULTIMATE'
+        ];
 
         // ===== KNOWLEDGE BASE =====
         const KNOWLEDGE = `
@@ -966,47 +1031,23 @@
             chat.scrollTo({ top: chat.scrollHeight, behavior: 'smooth' });
         }
 
+        // Expose to global scope for HTML clicks
+        window.askProject = function (projectName) {
+            const response = getKnowledge(projectName);
+            addMsg(response, 'bot');
+        };
+
         function getResponse(msg) {
             const m = msg.toLowerCase();
 
-            // Simple Keyword Matching
+            // Simple Keyword Matching logic refined
 
-            // Projects
-            if (m.includes('sun.ibonarium') || m.includes('sun') || m.includes('сонце')) return getKnowledge('SUN.IBONARIUM');
-            if (m.includes('planet') || m.includes('планет')) return getKnowledge('PLANET.RADAR');
-            if (m.includes('moon') || m.includes('місяц')) return getKnowledge('MOON.IBONARIUM');
-            if (m.includes('ecolog') || m.includes('еколог')) return getKnowledge('ECOLOGY.RADAR');
-            if (m.includes('translat') || m.includes('переклад')) return getKnowledge('.TRANSLATOR');
-            if (m.includes('magnet') || m.includes('магніт')) return getKnowledge('.MAGNET.LAB');
-            if (m.includes('cripto') || m.includes('crypto') || m.includes('крипто')) return getKnowledge('CRIPTO.LAB.LIVE');
-            if (m.includes('lavanda') || m.includes('soft')) return getKnowledge('LAVANDA.SOFT');
-            if (m.includes('tv') || m.includes('тб')) return getKnowledge('IBONARIUM.TV');
-            if (m.includes('stabil') || m.includes('стабіл')) return getKnowledge('SOLAR.STABILITY');
-            if (m.includes('modular.1.3') || m.includes('модулар')) return getKnowledge('I.MODULAR.1.3');
-            if (m.includes('drum') || m.includes('ритм')) return getKnowledge('I.DRUM.32');
-            if (m.includes('eco.system') || m.includes('систем')) return getKnowledge('ECO.SYSTEM');
-            if (m.includes('ocean') || m.includes('океан')) return getKnowledge('OCEAN.LAB');
-            if (m.includes('humanity') || m.includes('гуман') || m.includes('людство')) return getKnowledge('Humanity.LAB'); // Case insensitive fix
-            if (m.includes('xiii') || m.includes('13')) return getKnowledge('I.MODULARXIII');
-            if (m.includes('agro') || m.includes('агро')) return getKnowledge('AGRO.UA.LAB');
-            if (m.includes('arhive') || m.includes('архів')) return getKnowledge('ARHIVE.2026');
-
-            // Legacy Radars
-            if (m.includes('test2')) return getKnowledge('TEST2.ORIGINAL');
-            if (m.includes('soncemetr')) return getKnowledge('SONCEMETR 2026');
-            if (m.includes('new13')) return getKnowledge('NEW13 RADAR');
-            if (m.includes('hlam5')) return getKnowledge('HLAM5 SYSTEM');
-            if (m.includes('geopol')) return getKnowledge('GEOPOLITICAL PARSER');
-            if (m.includes('econom')) return getKnowledge('ECONOMIC RADAR');
-            if (m.includes('new5')) return getKnowledge('NEW5 ADVANCED');
-            if (m.includes('new14')) return getKnowledge('NEW14 ULTIMATE');
-
-            if (m.includes('радар') || m.includes('radar')) {
-                return `🎯 CORE РАДАРИ:\n\n• Test2\n• Soncemetr\n• New13\n• Hlam5\n• Geopolitical\n• Economic\n• New5\n• New14\n\nЗапитайте про конкретний!`;
+            // Check specific projects first
+            for (let p of projects) {
+                if (m.includes(p.toLowerCase())) return getKnowledge(p);
             }
-
-            if (m.includes('проект') || m.includes('project') || m.includes('lab')) {
-                return `🔬 ВСІ ПРОЕКТИ (СІЧЕНЬ):\n\n• sun.ibonarium\n• planet.radar\n• moon.ibonarium\n• ecology.radar\n• .translator\n• .magnet.lab\n• cripto.lab.live\n• lavanda.soft\n• ibonarium.tv\n• i.modular.1.3\n• ocean.lab\n• humanities.lab\n\n...та інші. Який цікавить?`;
+            for (let r of coreRadars) {
+                if (m.includes(r.toLowerCase().split(' ')[0])) return getKnowledge(r);
             }
 
             if (m.includes('kp') || m.includes('статус') || m.includes('звіт')) {
@@ -1014,41 +1055,69 @@
                 return `📊 ЗВІТ НА ${new Date().toLocaleTimeString('uk-UA')}:\n\nKp-Index: ${data.kp.toFixed(1)}\nСонячний вітер: ${data.wind.toFixed(0)} км/с\nЩільність: ${data.density.toFixed(1)} p/cm³\nBz: ${data.bz.toFixed(1)} nT\n\nСТАТУС СИСТЕМИ: ${s}`;
             }
 
-            return `Я Доцент. Маю дані про 26 проектів та радарів.\n\nСпробуйте запитати про:\n• "sun.ibonarium"\n• "cripto.lab"\n• "arhive.2026"\n• "solar.stability"`;
+            // Fallback
+            return `Я Доцент. Оберіть категорію або запитайте про проект.\n\nНаприклад:\n• "sun.ibonarium"\n• "status"\n• "help"`;
         }
 
         function getKnowledge(key) {
-            // Find section in markdown-like string
+            // 1. Exact header search attempts
             const normalize = str => str.toLowerCase().replace(/\s/g, '');
             const kLines = KNOWLEDGE.split('\n');
             let found = false;
             let result = '';
+            let targetHeader = '## ' + key.toUpperCase();
 
-            // Simple parser
-            for (let i = 0; i < kLines.length; i++) {
-                if (kLines[i].includes('##') && kLines[i].toLowerCase().includes(key.toLowerCase().split('.')[0])) {
-                    // Crude fuzzy match boost
-                    found = true;
-                } else if (kLines[i].includes('##') && found) {
-                    break; // Next section
+            // First pass: try to find strict ## NAME
+            // If key is 'test2.original', search for '## 1. TEST2.ORIGINAL' and looser matches
+
+            // Let's use more robust regex for finding the section
+            // Escape dots for regex
+            const safeKey = key.replace('.', '\\.').split(' ')[0]; // Take first word usually enough: 'sun' from 'sun.ibonarium' ? No, 'sun.ibonarium' is key.
+
+            // Better strategy: Search line by line for closure
+            let buffer = [];
+            let recording = false;
+
+            for (const line of kLines) {
+                if (line.startsWith('##')) {
+                    // Check if this header matches our key
+                    if (line.toLowerCase().includes(key.toLowerCase())) {
+                        recording = true;
+                    } else {
+                        recording = false;
+                    }
+                } else if (line.startsWith('# ')) {
+                    recording = false; // Main header stops it
                 }
 
-                if (found) result += kLines[i] + '\n';
-            }
-
-            // If failed to find by strict split match, try regex for the header
-            if (result.length < 10) {
-                const regex = new RegExp(`##.*${key.replace('.', '\.').split(' ')[0]}.*`, 'i');
-                const parts = KNOWLEDGE.split(regex);
-                if (parts.length > 1) {
-                    return parts[1].split('##')[0].trim();
+                if (recording && !line.startsWith('##')) {
+                    buffer.push(line);
                 }
-                return "Дані про цей проект завантажуються... (System Info Not Found)";
             }
 
-            // Remove the header line
-            return result.replace(/##.*\n/, '').trim();
+            if (buffer.length > 0) {
+                return buffer.join('\n').trim();
+            }
+
+            // Fallback for partials
+            if (key.includes('.')) {
+                const partial = key.split('.')[0];
+                // try again with partial
+                for (const line of kLines) {
+                    if (line.startsWith('##') && line.toLowerCase().includes(partial.toLowerCase())) {
+                        recording = true;
+                    } else if (line.startsWith('##') || line.startsWith('# ')) {
+                        if (recording && !line.toLowerCase().includes(partial.toLowerCase())) recording = false;
+                    }
+                    if (recording && !line.startsWith('##')) buffer.push(line);
+                }
+            }
+
+            if (buffer.length > 0) return buffer.join('\n').trim();
+
+            return `Дані про ${key} не знайдено в базі Knowledge Core.`;
         }
+
 
         document.getElementById('chatInput').addEventListener('keypress', (e) => {
             if (e.key === 'Enter') sendMsg();
@@ -1057,17 +1126,30 @@
         function quickAction(action) {
             switch (action) {
                 case 'radars':
-                    addMsg(`🎯 CORE РАДАРИ:\n\n1. TEST2\n2. SONCEMETR\n3. NEW13\n4. HLAM5\n5. GEOPOLITICAL\n6. ECONOMIC\n7. NEW5\n8. NEW14`, 'bot');
+                    let radarsHtml = '<div class="project-grid">';
+                    coreRadars.forEach(r => {
+                        radarsHtml += `<div class="project-item" onclick="askProject('${r}')">${r.replace(/\d+\. /, '')}</div>`;
+                    });
+                    radarsHtml += '</div>';
+                    addMsg(`🎯 CORE РАДАРИ:\n${radarsHtml}`, 'bot');
                     break;
+
                 case 'labs':
-                    addMsg(`🔬 ПРОЕКТИ СІЧЕНЬ:\n\n• sun.ibonarium\n• planet.radar\n• moon.ibonarium\n• ecology.radar\n• .translator\n• .magnet.lab\n• cripto.lab.live\n• lavanda.soft\n• ibonarium.tv\n• ocean.lab\n(див. повний список у базі)`, 'bot');
+                    let labsHtml = '<div class="project-grid">';
+                    projects.forEach(p => {
+                        labsHtml += `<div class="project-item" onclick="askProject('${p}')">${p}</div>`;
+                    });
+                    labsHtml += '</div>';
+                    addMsg(`🔬 ПРОЕКТИ СІЧЕНЬ (Оберіть для інфо):\n${labsHtml}`, 'bot');
                     break;
+
                 case 'report':
                     const status = data.kp >= 5 ? '⚠️ МАГНІТНА БУРЯ' : '✓ СИСТЕМИ В НОРМІ';
                     addMsg(`📊 ЗВІТ-2026:\n\nKp-Index: ${data.kp.toFixed(1)}\nВітер: ${data.wind.toFixed(0)} км/с\nBz: ${data.bz.toFixed(1)} nT\n\nСТАТУС: ${status}`, 'bot');
                     break;
+
                 case 'help':
-                    addMsg('❓ HELP MODE:\n\nНапишіть назву проекту для отримання довідки.\nНаприклад: "humanity.lab" або ".translator"', 'bot');
+                    addMsg('❓ HELP MODE:\n\nНатисніть "ПРОЕКТИ" або "РАДАРИ" для повного списку.\n\nНатисніть на назву проекту, щоб отримати детальний звіт.', 'bot');
                     break;
             }
         }

@@ -571,7 +571,11 @@
                     const latestPlasma = plasmaData[plasmaData.length - 1];
                     const latestMag = magData[magData.length - 1];
 
-                    if (latestKp) data.kp = parseFloat(latestKp[1]) || data.kp;
+                    if (latestKp) {
+                        const kpVal = latestKp.Kp !== undefined ? latestKp.Kp : latestKp[1];
+                        const parsedKp = parseFloat(kpVal);
+                        if (!isNaN(parsedKp)) data.kp = parsedKp;
+                    }
                     if (latestPlasma) {
                         data.wind = parseFloat(latestPlasma[2]) || data.wind;
                         data.density = parseFloat(latestPlasma[1]) || data.density;

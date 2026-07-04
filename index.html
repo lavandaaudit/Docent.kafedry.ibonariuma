@@ -1,6 +1,3 @@
-Ось повний код із виправленою логікою отримання Kp-індексу (тепер він правильно звертається до поля `Kp` в об'єкті JSON, а не пробує брати його як елемент масиву). Всі інші частини коду залишено без змін і скорочень.
-
-```html
 <!DOCTYPE html>
 <html lang="uk">
 
@@ -718,7 +715,7 @@
         ];
 
         // ===== KNOWLEDGE BASE =====
-        const KNOWLEDGE = `
+        const KNOWLEDGE = \`
 # ПРОЕКТИ СІЧЕНЬ 2026 - РОЗШИРЕНИЙ РЕЄСТР
 
 ## SUN.IBONARIUM
@@ -823,7 +820,7 @@
 **Опис:** Медіа-платформа візуалізації телеметрії та наукових даних у форматі безперервного відеопотоку. Синтез науки та мистецтва.
 **Контент та Можливості:**
 • Real-time дашборди з анімованою інфографікою
-• Генеративний арт на основі живих даних радарів та сенсорів
+• Генеративний арт на базі живих даних радарів та сенсорів
 • Прямі ефіри експериментальних запусків та тестів
 • Релаксаційні візуалізації (Space Ambient Visuals)
 • Інтерактивні інсталяції з керуванням через WebSockets
@@ -962,44 +959,50 @@
 ## 8. NEW14 ULTIMATE
 **Тип:** Інтегральний прогностичний центр
 **Опис:** Вершина еволюції радарів. Здійснює холістичний синтез всіх підсистем для глобального прогнозування стану цивілізації.
-`;
+\`;
 
         // ===== DATA =====
         let data = { kp: 0, wind: 0, density: 0, bz: 0, bt: 0 };
 
         async function fetchData() {
             try {
-                // Mock data fallback if API fails or blocks CORS
+                // Mock data fallback if API fails
                 data.kp = 3.2;
                 data.wind = 450;
                 data.density = 4.5;
                 data.bz = -2.1;
 
                 // Try real fetch
-                try {
-                    const [kpRes, plasmaRes, magRes] = await Promise.all([
-                        fetch('https://services.swpc.noaa.gov/products/noaa-planetary-k-index.json'),
-                        fetch('https://services.swpc.noaa.gov/products/solar-wind/plasma-5-minute.json'),
-                        fetch('https://services.swpc.noaa.gov/products/solar-wind/mag-5-minute.json')
-                    ]);
+                // Обертаємо кожен запит у Promise з catch, щоб помилка в одному не блокувала інші
+                const pKp = fetch('https://services.swpc.noaa.gov/products/noaa-planetary-k-index.json')
+                    .then(r => r.ok ? r.json() : null).catch(() => null);
+                
+                // ВИКОРИСТОВУЄМО НОВІ АДРЕСИ NOAA RTSW:
+                const pPlasma = fetch('https://services.swpc.noaa.gov/json/rtsw/rtsw_wind_1m.json')
+                    .then(r => r.ok ? r.json() : null).catch(() => null);
+                const pMag = fetch('https://services.swpc.noaa.gov/json/rtsw/rtsw_mag_1m.json')
+                    .then(r => r.ok ? r.json() : null).catch(() => null);
 
-                    if (kpRes.ok && plasmaRes.ok && magRes.ok) {
-                        const kpData = await kpRes.json();
-                        const plasmaData = await plasmaRes.json();
-                        const magData = await magRes.json();
+                const [kpData, plasmaData, magData] = await Promise.all([pKp, pPlasma, pMag]);
 
-                        data.kp = parseFloat(kpData[kpData.length - 1].Kp) || data.kp;
-                        data.wind = parseFloat(plasmaData[plasmaData.length - 1][2]) || data.wind;
-                        data.density = parseFloat(plasmaData[plasmaData.length - 1][1]) || data.density;
-                        data.bz = parseFloat(magData[magData.length - 1][3]) || data.bz;
-                    }
-                } catch (e) {
-                    console.log('Using cached/mock data due to CORS/Network');
+                if (kpData && kpData.length > 0) {
+                    data.kp = parseFloat(kpData[kpData.length - 1].Kp) || data.kp;
+                }
+                
+                if (plasmaData && plasmaData.length > 0) {
+                    // Новий формат RTSW NOAA (масив об'єктів, індекс 0 — найсвіжіший запис)
+                    data.wind = parseFloat(plasmaData[0].proton_speed) || data.wind;
+                    data.density = parseFloat(plasmaData[0].proton_density) || data.density;
+                }
+                
+                if (magData && magData.length > 0) {
+                    data.bz = parseFloat(magData[0].bz_gsm) || data.bz;
                 }
 
                 updateDisplay();
                 document.getElementById('dataStatus').textContent = 'DATA: OK';
             } catch (e) {
+                console.error("Fetch error:", e);
                 document.getElementById('dataStatus').textContent = 'DATA: ERR';
             }
         }
@@ -1017,20 +1020,20 @@
             const windStatus = getStatus(data.wind, [500, 600]);
             const bzStatus = getStatus(Math.abs(data.bz), [5, 10]);
 
-            document.getElementById('dataDisplay').innerHTML = `
+            document.getElementById('dataDisplay').innerHTML = \`
     <div class="data-row">
       <span class="data-label">Kp INDEX</span>
-      <span class="data-value">${data.kp.toFixed(1)}<span class="status-indicator status-${kpStatus}">${statusText[kpStatus]}</span></span>
+      <span class="data-value">\${data.kp.toFixed(1)}<span class="status-indicator status-\${kpStatus}">\${statusText[kpStatus]}</span></span>
     </div>
     <div class="data-row">
       <span class="data-label">WIND</span>
-      <span class="data-value">${data.wind.toFixed(0)} <span style="font-size:9px">km/s</span></span>
+      <span class="data-value">\${data.wind.toFixed(0)} <span style="font-size:9px">km/s</span></span>
     </div>
     <div class="data-row">
       <span class="data-label">Bz FIELD</span>
-      <span class="data-value">${data.bz.toFixed(1)} <span style="font-size:9px">nT</span></span>
+      <span class="data-value">\${data.bz.toFixed(1)} <span style="font-size:9px">nT</span></span>
     </div>
-  `;
+  \`;
         }
 
         fetchData();
@@ -1062,11 +1065,11 @@
             const time = new Date().toLocaleTimeString('uk-UA');
 
             const div = document.createElement('div');
-            div.className = `message msg-${type}`;
-            div.innerHTML = `
-    <div class="msg-time">${type === 'user' ? 'YOU' : 'DOCENT'} :: ${time}</div>
-    <div>${text}</div>
-  `;
+            div.className = \`message msg-\${type}\`;
+            div.innerHTML = \`
+    <div class="msg-time">\${type === 'user' ? 'YOU' : 'DOCENT'} :: \${time}</div>
+    <div>\${text}</div>
+  \`;
 
             chat.appendChild(div);
             // Auto scroll
@@ -1094,17 +1097,17 @@
 
             if (m.includes('kp') || m.includes('статус') || m.includes('звіт')) {
                 const s = data.kp >= 5 ? '⚠️ МАГНІТНА БУРЯ' : '✓ СТАБІЛЬНО';
-                return `📊 ЗВІТ НА ${new Date().toLocaleTimeString('uk-UA')}:\n\nKp-Index: ${data.kp.toFixed(1)}\nСонячний вітер: ${data.wind.toFixed(0)} км/с\nЩільність: ${data.density.toFixed(1)} p/cm³\nBz: ${data.bz.toFixed(1)} nT\n\nСТАТУС СИСТЕМИ: ${s}`;
+                return \`📊 ЗВІТ НА \${new Date().toLocaleTimeString('uk-UA')}:\n\nKp-Index: \${data.kp.toFixed(1)}\nСонячний вітер: \${data.wind.toFixed(0)} км/с\nЩільність: \${data.density.toFixed(1)} p/cm³\nBz: \${data.bz.toFixed(1)} nT\n\nСТАТУС СИСТЕМИ: \${s}\`;
             }
 
             // Fallback
-            return `Я Доцент. Оберіть категорію або запитайте про проект.\n\nНаприклад:\n• "sun.ibonarium"\n• "status"\n• "help"`;
+            return \`Я Доцент. Оберіть категорію або запитайте про проект.\n\nНаприклад:\n• "sun.ibonarium"\n• "status"\n• "help"\`;
         }
 
         function getKnowledge(key) {
             // 1. Exact header search attempts
-            const normalize = str => str.toLowerCase().replace(/\s/g, '');
-            const kLines = KNOWLEDGE.split('\n');
+            const normalize = str => str.toLowerCase().replace(/\\s/g, '');
+            const kLines = KNOWLEDGE.split('\\n');
             let found = false;
             let result = '';
             let targetHeader = '## ' + key.toUpperCase();
@@ -1114,7 +1117,7 @@
 
             // Let's use more robust regex for finding the section
             // Escape dots for regex
-            const safeKey = key.replace('.', '\\.').split(' ')[0]; // Take first word usually enough: 'sun' from 'sun.ibonarium' ? No, 'sun.ibonarium' is key.
+            const safeKey = key.replace('.', '\\\\.').split(' ')[0]; // Take first word usually enough: 'sun' from 'sun.ibonarium' ? No, 'sun.ibonarium' is key.
 
             // Better strategy: Search line by line for closure
             let buffer = [];
@@ -1138,7 +1141,7 @@
             }
 
             if (buffer.length > 0) {
-                return buffer.join('\n').trim();
+                return buffer.join('\\n').trim();
             }
 
             // Fallback for partials
@@ -1155,9 +1158,9 @@
                 }
             }
 
-            if (buffer.length > 0) return buffer.join('\n').trim();
+            if (buffer.length > 0) return buffer.join('\\n').trim();
 
-            return `Дані про ${key} не знайдено в базі Knowledge Core.`;
+            return \`Дані про \${key} не знайдено в базі Knowledge Core.\`;
         }
 
 
@@ -1170,34 +1173,31 @@
                 case 'radars':
                     let radarsHtml = '<div class="project-grid">';
                     coreRadars.forEach(r => {
-                        radarsHtml += `<div class="project-item" onclick="askProject('${r}')">${r.replace(/\d+\. /, '')}</div>`;
+                        radarsHtml += \`<div class="project-item" onclick="askProject('\${r}')">\${r.replace(/\\d+\\. /, '')}</div>\`;
                     });
                     radarsHtml += '</div>';
-                    addMsg(`🎯 CORE РАДАРИ:\n${radarsHtml}`, 'bot');
+                    addMsg(\`🎯 CORE РАДАРИ:\\n\${radarsHtml}\`, 'bot');
                     break;
 
                 case 'labs':
                     let labsHtml = '<div class="project-grid">';
                     projects.forEach(p => {
-                        labsHtml += `<div class="project-item" onclick="askProject('${p}')">${p}</div>`;
+                        labsHtml += \`<div class="project-item" onclick="askProject('\${p}')">\${p}</div>\`;
                     });
                     labsHtml += '</div>';
-                    addMsg(`🔬 ПРОЕКТИ СІЧЕНЬ (Оберіть для інфо):\n${labsHtml}`, 'bot');
+                    addMsg(\`🔬 ПРОЕКТИ СІЧЕНЬ (Оберіть для інфо):\\n\${labsHtml}\`, 'bot');
                     break;
 
                 case 'report':
                     const status = data.kp >= 5 ? '⚠️ МАГНІТНА БУРЯ' : '✓ СИСТЕМИ В НОРМІ';
-                    addMsg(`📊 ЗВІТ-2026:\n\nKp-Index: ${data.kp.toFixed(1)}\nВітер: ${data.wind.toFixed(0)} км/с\nBz: ${data.bz.toFixed(1)} nT\n\nСТАТУС: ${status}`, 'bot');
+                    addMsg(\`📊 ЗВІТ-2026:\\n\\nKp-Index: \${data.kp.toFixed(1)}\\nВітер: \${data.wind.toFixed(0)} км/с\\nBz: \${data.bz.toFixed(1)} nT\\n\\nСТАТУС: \${status}\`, 'bot');
                     break;
 
                 case 'help':
-                    addMsg('❓ HELP MODE:\n\nНатисніть "ПРОЕКТИ" або "РАДАРИ" для повного списку.\n\nНатисніть на назву проекту, щоб отримати детальний звіт.', 'bot');
+                    addMsg('Доступні команди:\\n- Натисніть кнопки меню для списків\\n- Напишіть "status" для звіту\\n- Або введіть назву проекту в чат.', 'bot');
                     break;
             }
         }
     </script>
-
 </body>
-
 </html>
-```

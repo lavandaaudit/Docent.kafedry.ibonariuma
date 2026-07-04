@@ -715,7 +715,7 @@
         ];
 
         // ===== KNOWLEDGE BASE =====
-        const KNOWLEDGE = \`
+        const KNOWLEDGE = `
 # ПРОЕКТИ СІЧЕНЬ 2026 - РОЗШИРЕНИЙ РЕЄСТР
 
 ## SUN.IBONARIUM
@@ -959,7 +959,7 @@
 ## 8. NEW14 ULTIMATE
 **Тип:** Інтегральний прогностичний центр
 **Опис:** Вершина еволюції радарів. Здійснює холістичний синтез всіх підсистем для глобального прогнозування стану цивілізації.
-\`;
+`;
 
         // ===== DATA =====
         let data = { kp: 0, wind: 0, density: 0, bz: 0, bt: 0 };
@@ -1020,7 +1020,7 @@
             const windStatus = getStatus(data.wind, [500, 600]);
             const bzStatus = getStatus(Math.abs(data.bz), [5, 10]);
 
-            document.getElementById('dataDisplay').innerHTML = \`
+            document.getElementById('dataDisplay').innerHTML = `
     <div class="data-row">
       <span class="data-label">Kp INDEX</span>
       <span class="data-value">\${data.kp.toFixed(1)}<span class="status-indicator status-\${kpStatus}">\${statusText[kpStatus]}</span></span>
@@ -1033,7 +1033,7 @@
       <span class="data-label">Bz FIELD</span>
       <span class="data-value">\${data.bz.toFixed(1)} <span style="font-size:9px">nT</span></span>
     </div>
-  \`;
+  `;
         }
 
         fetchData();
@@ -1065,11 +1065,11 @@
             const time = new Date().toLocaleTimeString('uk-UA');
 
             const div = document.createElement('div');
-            div.className = \`message msg-\${type}\`;
-            div.innerHTML = \`
+            div.className = `message msg-\${type}`;
+            div.innerHTML = `
     <div class="msg-time">\${type === 'user' ? 'YOU' : 'DOCENT'} :: \${time}</div>
     <div>\${text}</div>
-  \`;
+  `;
 
             chat.appendChild(div);
             // Auto scroll
@@ -1097,11 +1097,11 @@
 
             if (m.includes('kp') || m.includes('статус') || m.includes('звіт')) {
                 const s = data.kp >= 5 ? '⚠️ МАГНІТНА БУРЯ' : '✓ СТАБІЛЬНО';
-                return \`📊 ЗВІТ НА \${new Date().toLocaleTimeString('uk-UA')}:\n\nKp-Index: \${data.kp.toFixed(1)}\nСонячний вітер: \${data.wind.toFixed(0)} км/с\nЩільність: \${data.density.toFixed(1)} p/cm³\nBz: \${data.bz.toFixed(1)} nT\n\nСТАТУС СИСТЕМИ: \${s}\`;
+                return `📊 ЗВІТ НА \${new Date().toLocaleTimeString('uk-UA')}:\n\nKp-Index: \${data.kp.toFixed(1)}\nСонячний вітер: \${data.wind.toFixed(0)} км/с\nЩільність: \${data.density.toFixed(1)} p/cm³\nBz: \${data.bz.toFixed(1)} nT\n\nСТАТУС СИСТЕМИ: \${s}`;
             }
 
             // Fallback
-            return \`Я Доцент. Оберіть категорію або запитайте про проект.\n\nНаприклад:\n• "sun.ibonarium"\n• "status"\n• "help"\`;
+            return `Я Доцент. Оберіть категорію або запитайте про проект.\n\nНаприклад:\n• "sun.ibonarium"\n• "status"\n• "help"`;
         }
 
         function getKnowledge(key) {
@@ -1160,7 +1160,7 @@
 
             if (buffer.length > 0) return buffer.join('\\n').trim();
 
-            return \`Дані про \${key} не знайдено в базі Knowledge Core.\`;
+            return `Дані про \${key} не знайдено в базі Knowledge Core.`;
         }
 
 
@@ -1173,24 +1173,24 @@
                 case 'radars':
                     let radarsHtml = '<div class="project-grid">';
                     coreRadars.forEach(r => {
-                        radarsHtml += \`<div class="project-item" onclick="askProject('\${r}')">\${r.replace(/\\d+\\. /, '')}</div>\`;
+                        radarsHtml += `<div class="project-item" onclick="askProject('\${r}')">\${r.replace(/\\d+\\. /, '')}</div>`;
                     });
                     radarsHtml += '</div>';
-                    addMsg(\`🎯 CORE РАДАРИ:\\n\${radarsHtml}\`, 'bot');
+                    addMsg(`🎯 CORE РАДАРИ:\\n\${radarsHtml}`, 'bot');
                     break;
 
                 case 'labs':
                     let labsHtml = '<div class="project-grid">';
                     projects.forEach(p => {
-                        labsHtml += \`<div class="project-item" onclick="askProject('\${p}')">\${p}</div>\`;
+                        labsHtml += `<div class="project-item" onclick="askProject('\${p}')">\${p}</div>`;
                     });
                     labsHtml += '</div>';
-                    addMsg(\`🔬 ПРОЕКТИ СІЧЕНЬ (Оберіть для інфо):\\n\${labsHtml}\`, 'bot');
+                    addMsg(`🔬 ПРОЕКТИ СІЧЕНЬ (Оберіть для інфо):\\n\${labsHtml}`, 'bot');
                     break;
 
                 case 'report':
                     const status = data.kp >= 5 ? '⚠️ МАГНІТНА БУРЯ' : '✓ СИСТЕМИ В НОРМІ';
-                    addMsg(\`📊 ЗВІТ-2026:\\n\\nKp-Index: \${data.kp.toFixed(1)}\\nВітер: \${data.wind.toFixed(0)} км/с\\nBz: \${data.bz.toFixed(1)} nT\\n\\nСТАТУС: \${status}\`, 'bot');
+                    addMsg(`📊 ЗВІТ-2026:\\n\\nKp-Index: \${data.kp.toFixed(1)}\\nВітер: \${data.wind.toFixed(0)} км/с\\nBz: \${data.bz.toFixed(1)} nT\\n\\nСТАТУС: \${status}`, 'bot');
                     break;
 
                 case 'help':
